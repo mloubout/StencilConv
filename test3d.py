@@ -4,6 +4,11 @@ from devito import *
 import torch
 import torch.nn as nn
 
+from memutils import mem_report
+
+torch.set_num_threads(8)
+torch.set_default_tensor_type('torch.FloatTensor')
+
 
 @profile
 def conv(nx, ny, nz, nch, l, m, n):
@@ -54,7 +59,9 @@ def conv_torch(nx, ny, nz, nch, l, m, n):
 
         in_array = np.linspace(-1, 1, nx*ny*nz*nch).reshape(1, nch, nx, ny, nz).astype(np.float32)
         im_in = torch.from_numpy(in_array)
+        mem_report()
         im_out = convt(im_in)
+        mem_report()
         return im_out.detach().numpy()
 
 
