@@ -37,8 +37,6 @@ def conv(nx, ny, nz, nch, l, m, n):
     op()
 
     # then return im_our.data[::stride, ::stride] .... if stride, and batchsize just another dim like 6/7
-
-    print(norm(im_out))
     return im_out.data
 
 
@@ -57,7 +55,6 @@ def conv_torch(nx, ny, nz, nch, l, m, n):
         in_array = np.linspace(-1, 1, nx*ny*nz*nch).reshape(1, nch, nx, ny, nz).astype(np.float32)
         im_in = torch.from_numpy(in_array)
         im_out = convt(im_in)
-        print(np.linalg.norm(im_out.detach().numpy()))
         return im_out.detach().numpy()
 
 

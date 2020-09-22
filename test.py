@@ -9,14 +9,14 @@ import torch.nn as nn
 def conv(nx, ny, nch, n, m):
     # Image size
     dt = np.float64
-    x, y, c = SpaceDimension("x"), SpaceDimension("y"), SpaceDimension("c")
-    grid = Grid((nch, nx, ny), dtype=dt, dimensions=(c, x, y))
+    x, y, c = SpaceDimension("x"), SpaceDimension("y"), Dimension("c")
+    grid = Grid((nx, ny, nch), dtype=dt, dimensions=(x, y, c))
 
     stride = 2
 
     # Image
     im_in = Function(name="imi", grid=grid, space_order=1)
-    im_in.data[:, :, :] = np.linspace(-1, 1, nx*ny*nch).reshape(nch, nx, ny)
+    im_in.data[:, :, :] = np.linspace(-1, 1, nx*ny*nch).reshape(nch, nx, ny).transpose(1, 2, 0)
 
     # Output
     im_out = Function(name="imo", grid=grid, space_order=1)
@@ -30,7 +30,7 @@ def conv(nx, ny, nch, n, m):
         W.data[:, :, i] = np.linspace(i, i+(n*m), n*m).reshape(n, m)
 
     # Convlution
-    conv = sum([W[i2, i1, c]*im_in[c, x+i1-n//2, y+i2-m//2]
+    conv = sum([W[i2, i1, c]*im_in[x+i1-n//2, y+i2-m//2, c]
                 for i1 in range(n) for i2 in range(m)])
 
     op = Operator(Eq(im_out, conv))
@@ -56,7 +56,7 @@ def conv_torch(nx, ny, nch, n, m):
     im_in = torch.from_numpy(in_array)
     im_out = convt(im_in)
     print(np.linalg.norm(im_out.detach().numpy()))
-    return im_out.detach().numpy()
+    return im_out.detach().numpy().transpose(0, 2, 3, 1)
 
 
 if __name__ == '__main__':
