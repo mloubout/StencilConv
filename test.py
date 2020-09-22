@@ -5,14 +5,14 @@ from devito import *
 # Image size
 dt = np.float64
 nx, ny, nch = 1024, 1024, 4
-grid = Grid((nx, ny, nch), dtype=dt)
-x, y, c = grid.dimensions
+x, y, c = SpaceDimension("x"), SpaceDimension("y"), SpaceDimension("c")
+grid = Grid((nx, ny, nch), dtype=dt, dimensions=(x, y, c))
 
 stride = 2
 
 # Image
 im_in = Function(name="imi", grid=grid, space_order=1)
-im_in.data[:, :] = np.linspace(-1, 1, 1024**2).reshape(1024, 1024)
+im_in.data[:, :] = np.linspace(-1, 1, nx*ny).reshape(nx, ny)
 
 # Output
 im_out = Function(name="imo", grid=grid, space_order=1)
@@ -26,8 +26,8 @@ for i in range(nch):
     W.data[:, :, i] = np.linspace(i, i+(n*m), n*m).reshape(n, m)
 
 # Convlution
-conv = sum([W[k, l, c]*im_in[x+k-1, y+l-1, c]
-            for k in range(n) for l in range(m)])
+conv = sum([W[i1, i2, c]*im_in[x+i1-n//2, y+i2-m//2, c]
+            for i1 in range(n) for i2 in range(m)])
 
 op = Operator(Eq(im_out, conv))
 op()
