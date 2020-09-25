@@ -43,10 +43,10 @@ def conv(nx, ny, nch, n, m, n_runs):
 
 
 if __name__ == '__main__':
-    nx, ny, nch = 2048, 2048, 4
+    nx, ny, nch = 16384, 16384, 2
     n, m = 3, 3
 
-    n_runs = [2**j for j in range(13)]
+    n_runs = [2**j for j in range(10)]
     run_times = []
     for i in n_runs:
         run_times.append(conv(nx, ny, nch, n, m, i))

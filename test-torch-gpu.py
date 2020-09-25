@@ -4,6 +4,7 @@ import torch.nn as nn
 import time
 torch.set_num_threads(8)
 torch.set_default_tensor_type('torch.FloatTensor')
+device = torch.device('cuda')
 
 def conv_torch(nx, ny, nch, n, m, n_runs):
 
@@ -20,8 +21,11 @@ def conv_torch(nx, ny, nch, n, m, n_runs):
 
         convt.weight[:] = torch.from_numpy(ww)
 
+        convt = convt.to(device)
+
         input_data = np.linspace(-1, 1, nx*ny*nch).reshape(1, nch, nx, ny)
         im_in = torch.from_numpy(input_data.astype(np.float32))
+        im_in = im_in.to(device)
 
         for j in range(n_runs):
             im_out = convt(im_in)
@@ -38,6 +42,6 @@ if __name__ == '__main__':
     for i in n_runs:
         run_times.append(conv_torch(nx, ny, nch, n, m, i))
 
-    with open('torch-conv-run-times.txt', 'w') as f:
+    with open('torch-gpu-conv-run-times.txt', 'w') as f:
         for item in run_times:
             f.write("%s\n" % item)
