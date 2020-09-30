@@ -17,14 +17,14 @@ def conv(nx, ny, nch, n, m):
     # Image size
     dt = np.float32
     x, y, c = SpaceDimension("x"), SpaceDimension("y"), Dimension("c")
-    grid = Grid((nx, ny, nch), dtype=dt, dimensions=(x, y, c))
+    grid = Grid((nch, nx, ny), dtype=dt, dimensions=(c, x, y))
 
     stride = 2
 
     # Image
     im_in = Function(name="imi", grid=grid, space_order=1)
     input_data = np.linspace(-1, 1, nx*ny*nch).reshape(nch, nx, ny)
-    im_in.data[:] = input_data.transpose(1, 2, 0).astype(np.float32)
+    im_in.data[:] = input_data.astype(np.float32)
 
     # Output
     im_out = Function(name="imo", grid=grid, space_order=1)
@@ -32,13 +32,13 @@ def conv(nx, ny, nch, n, m):
 
     # Weights
     i, j = Dimension("i"), Dimension("j")
-    W = Function(name="W", dimensions=(i, j, c), shape=(n, m, nch), grid=grid)
+    W = Function(name="W", dimensions=(c, i, j), shape=(nch, n, m), grid=grid)
     # popuate weights with deterministic values
     for i in range(nch):
-        W.data[:, :, i] = np.linspace(i, i+(n*m), n*m).reshape(n, m)
+        W.data[i, :, :] = np.linspace(i, i+(n*m), n*m).reshape(n, m)
 
     # Convlution
-    conv = sum([W[i2, i1, c]*im_in[x+i1-n//2, y+i2-m//2, c]
+    conv = sum([W[c, i2, i1]*im_in[c, x+i1-n//2, y+i2-m//2]
                 for i1 in range(n) for i2 in range(m)])
 
     op = Operator(Eq(im_out, conv))
@@ -69,7 +69,7 @@ def conv_torch(nx, ny, nch, n, m):
 
     print(prof.key_averages().table(sort_by="cpu_memory_usage", row_limit=10))
 
-    return im_out.numpy().transpose(0, 2, 3, 1)
+    return im_out.numpy()
 
 
 if __name__ == '__main__':
