@@ -43,14 +43,14 @@ def conv(nx, ny, nch, n, m, n_runs):
 
 
 if __name__ == '__main__':
+
     nch = 2
-    n, m = 7, 7
-
+    n_list = [3, 5, 7, 11]
     nx_list = [2**j for j in range(5, 15)]
-    run_times = []
-    for nx in nx_list:
-        run_times.append(conv(nx, nx, nch, n, m, 50))
 
-    with open('scaling-devito-conv-run-times.txt', 'w') as f:
-        for item in run_times:
-            f.write("%s\n" % item)
+    with open('scaling-devito.txt', 'w') as f:
+        for n in n_list:
+            for nx in nx_list:
+                run_time = conv(nx, nx, nch, n, n, 50)
+                f.write("%s,%s\n" %(n, run_time))
+                f.flush()
