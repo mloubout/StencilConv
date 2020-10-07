@@ -6,6 +6,7 @@ import torch.nn as nn
 import torch.autograd.profiler as profiler
 
 from memory_profiler import profile
+import matplotlib.pyplot as plt
 
 configuration['log-level'] = 'WARNING'
 torch.set_num_threads(8)
@@ -16,14 +17,16 @@ torch.set_default_tensor_type('torch.FloatTensor')
 def conv(nx, ny, nch, n, m):
     # Image size
     dt = np.float32
+    px, py = n//2 + 1, m//2 + 1
     x, y, c = SpaceDimension("x"), SpaceDimension("y"), Dimension("c")
-    grid = Grid((nch, nx, ny), dtype=dt, dimensions=(c, x, y))
+    grid = Grid((nch, nx+2*px, ny+2*py), dtype=dt, dimensions=(c, x, y))
 
     stride = 2
 
     # Image
     im_in = Function(name="imi", grid=grid, space_order=1)
-    input_data = np.linspace(-1, 1, nx*ny*nch).reshape(nch, nx, ny)
+    input_data = np.zeros([nch, nx+2*px, ny+2*py])
+    input_data[:, px:-px, py:-py] = np.linspace(-1, 1, nx*ny*nch).reshape(nch, nx, ny)
     im_in.data[:] = input_data.astype(np.float32)
 
     # Output
@@ -45,7 +48,7 @@ def conv(nx, ny, nch, n, m):
     op()
 
     # then return im_our.data[::stride, ::stride] .... if stride, and batchsize jut another dim like 6/7
-    return im_out.data
+    return im_out.data[:, px:-px, py:-py]
 
 
 def conv_torch(nx, ny, nch, n, m):
@@ -53,7 +56,7 @@ def conv_torch(nx, ny, nch, n, m):
     with profiler.profile(profile_memory=True, record_shapes=True) as prof:
         with torch.no_grad():
 
-            convt = nn.Conv2d(nch, nch, (n, m), stride=(1, 1), padding=(1, 1),
+            convt = nn.Conv2d(nch, nch, (n, m), stride=(1, 1), padding=(n//2, m//2),
                               bias=False)
 
             ww = np.zeros((nch, nch, n, m), dtype=np.float32)
@@ -69,7 +72,7 @@ def conv_torch(nx, ny, nch, n, m):
 
     print(prof.key_averages().table(sort_by="cpu_memory_usage", row_limit=10))
 
-    return im_out.numpy()
+    return im_out.numpy()[0, ...]
 
 
 if __name__ == '__main__':
@@ -77,5 +80,11 @@ if __name__ == '__main__':
     n, m = 3, 3
     res1 = conv(nx, ny, nch, n, m)
     res2 = conv_torch(nx, ny, nch, n, m)
+
     err = np.linalg.norm(res1 - res2)/np.linalg.norm(res1)
+    plt.imshow(res1.sum(axis=0) - res2.sum(axis=0), cmap="seismic",
+               vmin=-1e-1, vmax=1e-1)
+    plt.colorbar()
+    plt.show()
+
     print("Difference between devito and pytorch is %2.2e \n" % err)
