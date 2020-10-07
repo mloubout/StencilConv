@@ -12,8 +12,8 @@ def conv_torch(nx, ny, nch, n, m, n_runs):
 
     with torch.no_grad():
 
-        convt = nn.Conv2d(nch, nch, (n, m), stride=(1, 1), padding=(1, 1),
-                          bias=False)
+        convt = nn.Conv2d(nch, nch, (n, m), stride=(1, 1),
+                          padding=(n//2, m//2), bias=False)
 
         ww = np.zeros((nch, nch, n, m), dtype=np.float32)
         for i in range(nch):
@@ -35,13 +35,13 @@ def conv_torch(nx, ny, nch, n, m, n_runs):
 
 if __name__ == '__main__':
     nch = 2
-    n, m = 3, 3
+    n, m = 7, 7
 
     nx_list = [2**j for j in range(5, 15)]
     run_times = []
     try:
         for nx in nx_list:
-            run_times.append(conv_torch(nx, nx, nch, n, m, 200))
+            run_times.append(conv_torch(nx, nx, nch, n, m, 50))
     except:
         print("not enough memory")
 

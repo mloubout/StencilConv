@@ -16,12 +16,12 @@ def conv(nx, ny, nch, n, m, n_runs):
     stride = 2
 
     # Image
-    im_in = Function(name="imi", grid=grid, space_order=1)
+    im_in = Function(name="imi", grid=grid, space_order=n//2)
     input_data = np.linspace(-1, 1, nx*ny*nch).reshape(nch, nx, ny)
     im_in.data[:] = input_data.astype(np.float32)
 
     # Output
-    im_out = Function(name="imo", grid=grid, space_order=1)
+    im_out = Function(name="imo", grid=grid, space_order=n//2)
     im_out.data
 
     # Weights
@@ -44,12 +44,12 @@ def conv(nx, ny, nch, n, m, n_runs):
 
 if __name__ == '__main__':
     nch = 2
-    n, m = 3, 3
+    n, m = 7, 7
 
     nx_list = [2**j for j in range(5, 15)]
     run_times = []
     for nx in nx_list:
-        run_times.append(conv(nx, nx, nch, n, m, 200))
+        run_times.append(conv(nx, nx, nch, n, m, 50))
 
     with open('scaling-devito-conv-run-times.txt', 'w') as f:
         for item in run_times:

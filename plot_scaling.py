@@ -9,8 +9,7 @@ font = {'family': 'serif',
 matplotlib.rc('font', **font)
 
 filenames = ['scaling-devito-conv-run-times.txt',
-             'scaling-torch-conv-run-times.txt',
-             'scaling-torch-gpu-conv-run-times.txt']
+             'scaling-torch-conv-run-times.txt']
 
 run_times = []
 for file in filenames:
@@ -33,18 +32,14 @@ plt.plot(img_size(len(run_times[1])), run_times[1],
 plt.scatter(img_size(len(run_times[1])), run_times[1],
             color='#22c1d6', s=1.5)
 
-plt.plot(img_size(len(run_times[2])), run_times[2],
-         color='#aab304', linewidth=1.0, label='torch on gpu (4 GB)')
-plt.scatter(img_size(len(run_times[2])), run_times[2],
-            color='#aab304', s=1.5)
-
 plt.legend(fontsize=8)
-plt.title("200 calls to conv for image w/ size " + r"$n_x \times n_x$")
+plt.title("50 calls to " + r"$7 \times 7$" + " conv to "
+          + r"$n \times n$" +" image")
 plt.ylabel("wall-clock time (s)")
-plt.xlabel(r"$n_x$")
+plt.xlabel(r"$n$")
 plt.xscale('log')
 plt.yscale('log')
 plt.grid()
-plt.savefig('scaling.png' ,format='png', bbox_inches='tight',
+plt.savefig('scaling_k=7_calls=50.png' ,format='png', bbox_inches='tight',
             dpi=200, pad_inches=.05)
 plt.close(fig)
