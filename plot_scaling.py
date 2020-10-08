@@ -8,38 +8,56 @@ font = {'family': 'serif',
         'size': 8}
 matplotlib.rc('font', **font)
 
-filenames = ['scaling-devito-conv-run-times.txt',
-             'scaling-torch-conv-run-times.txt']
-
-run_times = []
-for file in filenames:
-    with open(file) as f:
-        content = f.readlines()
-    content = [float(x.strip()) for x in content]
-    run_times.append(content)
-
 def img_size(n_points):
     return [2**(5 + j) for j in range(n_points)]
 
-fig = plt.figure("Scaling", dpi=200, figsize=(7, 2.5))
-plt.plot(img_size(len(run_times[0])), run_times[0],
-         color='#be22d6', linewidth=1.0, label='devito on cpu')
-plt.scatter(img_size(len(run_times[0])), run_times[0],
-            color='#be22d6', s=1.5)
+filenames = ['scaling-devito.txt',
+             'scaling-torch.txt']
 
-plt.plot(img_size(len(run_times[1])), run_times[1],
-         color='#22c1d6', linewidth=1.0, label='torch on cpu')
-plt.scatter(img_size(len(run_times[1])), run_times[1],
-            color='#22c1d6', s=1.5)
+run_times = {}
+for file in filenames:
+    run_times[file] = {"3": [], "5": [], "7": [], "11": []}
 
-plt.legend(fontsize=8)
-plt.title("50 calls to " + r"$7 \times 7$" + " conv to "
-          + r"$n \times n$" +" image")
-plt.ylabel("wall-clock time (s)")
-plt.xlabel(r"$n$")
+for file in filenames:
+    with open(file) as f:
+        for content in f.readlines():
+            n, run_time = content.rstrip().split(',')
+            run_times[file][str(n)].append(float(run_time))
+
+colors = [(0.0,0.0,0.0),
+(0.0,0.584,1.0),
+(1.0,0.0,0.286),
+(0.0,0.584,0.239),
+'#8a8a8a',
+'#a1c0ff',
+'#ff9191',
+'#91eda2']
+
+fig = plt.figure("Scaling devito", figsize=(7, 2.5))
+
+counter = 0
+for file in filenames:
+    for n_str in run_times[file].keys():
+        n = float(n_str)
+
+        plt.plot(img_size(len(run_times[file][n_str])),
+                 run_times[file][n_str],
+                 color=colors[counter], linewidth=1.0,
+                 label=file[8:-4] + " — " + r"$k={}$".format(int(n)))
+        plt.scatter(img_size(len(run_times[file][n_str])),
+                    run_times[file][n_str],
+                    color=colors[counter], s=0.8)
+
+        counter += 1
+
+plt.legend(fontsize=6, ncol=2)
+plt.ylabel("wall-clock time (s)", fontsize=8)
+plt.xlabel(r"$n$", fontsize=10)
+plt.title("50 calls to a " + r"$k \times k \ conv$" + " — image size: "
+          + r"$n \times n$")
 plt.xscale('log')
 plt.yscale('log')
-plt.grid()
-plt.savefig('scaling_k=7_calls=50.png' ,format='png', bbox_inches='tight',
-            dpi=200, pad_inches=.05)
+plt.grid(True, which="both", ls="-", alpha=.2)
+plt.savefig('scaling.png' ,format='png', bbox_inches='tight',
+            dpi=400, pad_inches=.05)
 plt.close(fig)
