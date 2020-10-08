@@ -35,16 +35,13 @@ def conv_torch(nx, ny, nch, n, m, n_runs):
 if __name__ == '__main__':
 
     nch = 2
-    n_list = [3, 5, 7, 11]
+    n_list = [5, 7, 11, 3]
     nx_list = [2**j for j in range(5, 15)]
 
-    with open('scaling-torch-gpu.txt', 'w') as f:
+    with open('scaling-torch-gpu-' + str(n.txt', 'w') as f:
         for n in n_list:
             for nx in nx_list:
-                try:
-                    run_time = conv_torch(nx, nx, nch, n, n, 50)
-                except:
-                    print("not enough memory")
-                    run_time = -1
+                run_time = conv_torch(nx, nx, nch, n, n, 50)
                 f.write("%s,%s\n" %(n, run_time))
                 f.flush()
+                print(n , nx)

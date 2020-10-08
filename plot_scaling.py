@@ -18,7 +18,7 @@ filenames = ['scaling-devito.txt',
 run_times = {}
 for file in filenames:
     run_times[file] = {"3": [], "5": [], "7": [], "11": []}
-
+2
 for file in filenames:
     with open(file) as f:
         for content in f.readlines():
@@ -38,7 +38,7 @@ colors = [(0.0,0.0,0.0),
           '#ff9191',
           '#91eda2']
 
-fig = plt.figure("Scaling devito", figsize=(7, 2.5))
+fig = plt.figure("Scaling devito", figsize=(8, 3))
 
 counter = 0
 for file in filenames:
@@ -51,7 +51,7 @@ for file in filenames:
             linestyle = '-'
         plt.plot(img_size(len(run_times[file][n_str])),
                  run_times[file][n_str],
-                 color=colors[counter], linewidth=1.0, linestyle=linestyle,
+                 color=colors[counter], linewidth=0.7, linestyle=linestyle,
                  label=file[8:-4] + " — " + r"$k={}$".format(int(n)))
         plt.scatter(img_size(len(run_times[file][n_str])),
                     run_times[file][n_str],
@@ -59,7 +59,7 @@ for file in filenames:
 
         counter += 1
 
-plt.legend(fontsize=5, ncol=3)
+plt.legend(fontsize=6, ncol=3)
 plt.ylabel("wall-clock time (s)", fontsize=8)
 plt.xlabel(r"$n$", fontsize=10)
 plt.title("50 calls to a " + r"$k \times k \ conv$" + " — image size: "
