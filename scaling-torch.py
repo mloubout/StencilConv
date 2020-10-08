@@ -14,7 +14,6 @@ def conv_torch(nx, ny, nch, n, m, n_runs):
         convt = nn.Conv2d(nch, nch, (n, m), stride=(1, 1),
                           padding=(n//2, m//2), bias=False)
 
-
         ww = np.zeros((nch, nch, n, m), dtype=np.float32)
         for i in range(nch):
             ww[i, i, :, :] = np.linspace(i, i+(n*m), n*m).reshape(n, m).T

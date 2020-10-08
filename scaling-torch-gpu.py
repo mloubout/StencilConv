@@ -2,7 +2,6 @@ import numpy as np
 import torch
 import torch.nn as nn
 import time
-torch.set_num_threads(8)
 torch.set_default_tensor_type('torch.FloatTensor')
 device = torch.device('cuda')
 
@@ -34,17 +33,18 @@ def conv_torch(nx, ny, nch, n, m, n_runs):
 
 
 if __name__ == '__main__':
+
     nch = 2
-    n, m = 7, 7
-
+    n_list = [3, 5, 7, 11]
     nx_list = [2**j for j in range(5, 15)]
-    run_times = []
-    try:
-        for nx in nx_list:
-            run_times.append(conv_torch(nx, nx, nch, n, m, 50))
-    except:
-        print("not enough memory")
 
-    with open('scaling-torch-gpu-conv-run-times.txt', 'w') as f:
-        for item in run_times:
-            f.write("%s\n" % item)
+    with open('scaling-torch-gpu.txt', 'w') as f:
+        for n in n_list:
+            for nx in nx_list:
+                try:
+                    run_time = conv_torch(nx, nx, nch, n, n, 50)
+                except:
+                    print("not enough memory")
+                    run_time = -1
+                f.write("%s,%s\n" %(n, run_time))
+                f.flush()
