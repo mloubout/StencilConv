@@ -2,7 +2,8 @@ import sys
 import numpy as np
 from devito import (SpaceDimension, Dimension, Grid, Function, Operator, Eq,
                     configuration)
-configuration['log-level'] = 'WARNING'
+import time
+configuration['log-level'] = 'ERROR'
 
 
 def conv(nx, ny, nch, n, m, n_runs):
@@ -35,8 +36,10 @@ def conv(nx, ny, nch, n, m, n_runs):
 
     # Applying convolution
     op = Operator(Eq(im_out, conv))
-    for j in range(n_runs):
-        op()
+    op.cfunction
+    return op
+    #for j in range(n_runs):
+    #    op()
 
 
 if __name__ == '__main__':
@@ -44,4 +47,12 @@ if __name__ == '__main__':
     k = int(sys.argv[1])
     n = 2**int(sys.argv[2])
     nch = 2**int(sys.argv[3])
-    conv(n, n, nch, k, k, 50)
+    t0 = time.time()
+    op = conv(n, n, nch, k, k, 50)
+    print("Operator generation and compilation time=%2.2f ms" % (1e3*(time.time()-t0)))
+    t0 = time.time()
+    tdv = 0
+    for j in range(50):
+        summary = op()
+        tdv += sum([v for _, v in summary.timings.items()]) 
+    print("(%d, %d) with %d channels and k=%d runtime= %2.3f ms, dvtime=%2.3f ms" % (n,n,nch,k,1e3*(time.time()-t0), 1e3*tdv))
