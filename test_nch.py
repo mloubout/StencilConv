@@ -17,7 +17,7 @@ def conv(nx, ny, nchi, ncho, n, m, ngroup=1):
     # Image size
     dt = np.float32
     x, y, ci, co = SpaceDimension("x"), SpaceDimension("y"), Dimension("ci"), Dimension("co")
-    grid = Grid((nchi, ncho, nx, ny), dtype=dt, dimensions=(ci, co, x, y))
+    grid = Grid((nx, ny, nchi, ncho), dtype=dt, dimensions=(x, y, ci, co))
 
     stride = 2
 
@@ -56,14 +56,14 @@ def grad(nx, ny, nchi, ncho, n, m, xdat, dydat):
     # Image size
     dt = np.float32
     x, y, ci, co = SpaceDimension("x"), SpaceDimension("y"), Dimension("ci"), Dimension("co")
-    grid = Grid((nchi, ncho, nx, ny), dtype=dt, dimensions=(ci, co, x, y))
+    grid = Grid((nx, ny), dtype=dt, dimensions=(x, y))
 
     stride = 2
 
     # Image
     X = Function(name="xin", dimensions=(ci, x, y),
                  shape=(nchi, nx, ny), grid=grid, space_order=n//2)
-    X.data[:] = xdat
+    X.data[:] = xdat[:]
     # Output
     dy = Function(name="dy", dimensions=(co, x, y),
                   shape=(ncho, nx, ny), grid=grid, space_order=n//2)
@@ -74,9 +74,9 @@ def grad(nx, ny, nchi, ncho, n, m, xdat, dydat):
     dW = Function(name="dW", dimensions=(co, ci, i, j), shape=(ncho, nchi, n, m), grid=grid)
 
     # Convolution
-    grad_eq = [Eq(dW[co, ci, i, j], dW[co, ci, i, j] + dy[co, x, y]*X[ci, x+i-n//2, y+j-m//2])
-               for i in range(n) for j in range(m)]
-
+    #grad_eq = [Eq(dW[co, ci, i, j], dW[co, ci, i, j] + dy[co, x, y]*X[ci, x+i-n//2, y+j-m//2])
+    #           for i in range(n) for j in range(m)]
+    grad_eq = Inc(dW[co, ci, i, j], dy[co, x, y]*X[ci, x+i-n//2, y+j-m//2])
     op = Operator(grad_eq)
     op()
 
@@ -110,7 +110,7 @@ def conv_torch(nx, ny, nchi, ncho, n, m):
 
 
 if __name__ == '__main__':
-    nx, ny, nchi, ncho = 128, 128, 1, 1
+    nx, ny, nchi, ncho = 128, 128, 4, 4
     n, m = 3, 3
     res1, x = conv(nx, ny, nchi, ncho, n, m)
     res2, grad_t = conv_torch(nx, ny, nchi, ncho, n, m)
