@@ -39,7 +39,6 @@ def conv(nx, ny, nchi, ncho, n, m, n_runs):
 
     op = Operator(conv)
     op.cfunction
-    from IPython import embed; embed()
     return op
     #for j in range(n_runs):
     #    op()
