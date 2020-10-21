@@ -63,11 +63,10 @@ def grad(nx, ny, nchi, ncho, n, m, xdat, dydat):
     # Image
     X = Function(name="xin", dimensions=(ci, x, y),
                  shape=(nchi, nx, ny), grid=grid, space_order=n//2)
-    X.data[:] = xdat[:]
+
     # Output
     dy = Function(name="dy", dimensions=(co, x, y),
                   shape=(ncho, nx, ny), grid=grid, space_order=n//2)
-    dy.data[:] = dydat[:]
 
     # Weights
     i, j = Dimension("i"), Dimension("j")
@@ -78,6 +77,11 @@ def grad(nx, ny, nchi, ncho, n, m, xdat, dydat):
     #           for i in range(n) for j in range(m)]
     grad_eq = Inc(dW[co, ci, i, j], dy[co, x, y]*X[ci, x+i-n//2, y+j-m//2])
     op = Operator(grad_eq)
+    op.cfunction
+
+    X.data[:] = xdat[:]
+    dy.data[:] = dydat[:]
+
     op()
 
     return dW.data[:]
