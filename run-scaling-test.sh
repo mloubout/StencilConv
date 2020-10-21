@@ -3,7 +3,7 @@
 [ -d logs ] || mkdir logs
 
 echo "Running Devito tests"
-devito_file=logs/devito-conv.txt
+devito_file=logs/devito-conv-split.txt
 rm -f $devito_file
 
 for log_nch in `seq 1 1 4`
@@ -16,7 +16,8 @@ do
 
             info=$( { /usr/bin/time --format \
                    'wall-clock time (s): %e\nmemory (kbytes): %M' \
-                   python devito-conv.py $k $log_n $log_nch; } 2>&1 )
+                   python devito-conv.py $k $log_n $log_nch >> $devito_file; \
+                   } 2>&1 )
 
             if [ $? -eq 0 ]
             then
@@ -26,11 +27,11 @@ do
                 memory=$(echo "$info" | grep "memory" |& grep -oP \
                     '(?<=(kbytes)\): ).*')
 
-                echo "$log_nch,$k,$log_n,$run_time,$memory" >> $devito_file
+                echo "$log_nch $k $log_n $run_time $memory" >> $devito_file
 
             else
                 echo "Failed — perhaps low memory"
-                echo "$log_nch,$k,$log_n,-1,-1" >> $devito_file
+                echo "$log_nch $k $log_n -1 -1" >> $devito_file
             fi
         done
 
@@ -42,7 +43,7 @@ done
 
 
 echo "Running PyTorch CPU tests"
-torch_file=logs/torch-conv.txt
+torch_file=logs/torch-conv-split.txt
 rm -f $torch_file
 
 for log_nch in `seq 1 1 4`
@@ -55,7 +56,8 @@ do
 
             info=$( { /usr/bin/time --format \
                    'wall-clock time (s): %e\nmemory (kbytes): %M' \
-                   python torch-conv.py $k $log_n $log_nch; } 2>&1 )
+                   python torch-conv.py $k $log_n $log_nch >> $torch_file; \
+                   } 2>&1 )
 
             if [ $? -eq 0 ]
             then
@@ -65,11 +67,11 @@ do
                 memory=$(echo "$info" | grep "memory" |& grep -oP \
                     '(?<=(kbytes)\): ).*')
 
-                echo "$log_nch,$k,$log_n,$run_time,$memory" >> $torch_file
+                echo "$log_nch $k $log_n $run_time $memory" >> $torch_file
 
             else
                 echo "Failed — perhaps low memory"
-                echo "$log_nch,$k,$log_n,-1,-1" >> $torch_file
+                echo "$log_nch $k $log_n -1 -1" >> $torch_file
             fi
         done
 
