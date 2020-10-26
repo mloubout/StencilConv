@@ -121,7 +121,7 @@ if __name__ == '__main__':
             axs[r].set_xscale('log')
             axs[r].set_yscale('log')
             axs[r].set_xlim([2e1, 2e4])
-            axs[r].set_ylim([3e-1, 2e3])
+            axs[r].set_ylim([3e-1, 6e3])
             ax.grid(True, which="both", ls="-", alpha=.2)
 
     for j, fig in enumerate(figs):
@@ -238,7 +238,7 @@ if __name__ == '__main__':
             axs[r].set_xscale('log')
             axs[r].set_yscale('log')
             axs[r].set_xlim([2e1, 2e4])
-            axs[r].set_ylim([4e-3, 2e3])
+            axs[r].set_ylim([4e-3, 6e3])
             ax.grid(True, which="both", ls="-", alpha=.2)
 
     for j, fig in enumerate(figs):
