@@ -3,7 +3,7 @@
 [ -d logs ] || mkdir logs
 
 echo "Running Devito tests"
-devito_file=logs/devito-conv-split.txt
+devito_file=logs/devito-conv-fast.txt
 rm -f $devito_file
 
 for log_nch in `seq 1 1 4`
@@ -16,7 +16,7 @@ do
 
             info=$( { /usr/bin/time --format \
                    'wall-clock time (s): %e\nmemory (kbytes): %M' \
-                   python devito-conv.py $k $log_n $log_nch >> $devito_file; \
+                   python devito-conv-fast.py $k $log_n $log_nch >> $devito_file; \
                    } 2>&1 )
 
             if [ $? -eq 0 ]
@@ -43,7 +43,7 @@ done
 
 
 echo "Running PyTorch CPU tests"
-torch_file=logs/torch-conv-split.txt
+torch_file=logs/torch-conv.txt
 rm -f $torch_file
 
 for log_nch in `seq 1 1 4`

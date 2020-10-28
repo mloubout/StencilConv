@@ -44,7 +44,7 @@ def conv(nx, ny, nchi, ncho, n, m, ngroup=1):
     conv = [Eq(im_out[co, x, y], im_out[co, x, y] + sum([W[co, ci, i, j] * im_in[ci, x+i-n//2, y+j-m//2] for ci in range(nchi)])) for co in range(ncho)]
     op = Operator(conv)
     op()
-    # then return im_our.data[::stride, ::stride] .... if stride, and batchsize jut another dim like 6/7
+    print(op)
     return im_out.data, im_in.data
 
 
@@ -69,8 +69,6 @@ def grad(nx, ny, nchi, ncho, n, m, xdat, dydat):
     dW = Function(name="dW", dimensions=(co, ci, i, j), shape=(ncho, nchi, n, m), grid=grid)
 
     # Convolution
-    #grad_eq = [Eq(dW[co, ci, i, j], dW[co, ci, i, j] + dy[co, x, y]*X[ci, x+i-n//2, y+j-m//2])
-    #           for i in range(n) for j in range(m)]
     grad_eq = Inc(dW[co, ci, i, j], dy[co, x, y]*X[ci, x+i-n//2, y+j-m//2])
     op = Operator(grad_eq)
     op.cfunction
