@@ -108,7 +108,7 @@ if __name__ == '__main__':
                     linestyle = '-'
                 axs[r].plot(n_list, run_times, color=colors[5*j + i],
                             linewidth=0.4, linestyle=linestyle,
-                            label=(file[:file.find('-')] + " — "
+                            label=(file[:file.find('-')] + " - "
                                    + r"$k={{{}}}$".format(k)))
 
             axs[r].legend(fontsize=6, ncol=2, loc='upper left')
@@ -116,7 +116,7 @@ if __name__ == '__main__':
             axs[r].set_xlabel(r"$n$", fontsize=10)
             axs[r].set_title("OP build and 50 calls to a "
                              + r"$k \times k \ conv$"
-                             + " — image size: "
+                             + " - image size: "
                              + r"$n \times n \times {{{}}}$".format(nch))
             axs[r].set_xscale('log')
             axs[r].set_yscale('log')
@@ -166,7 +166,7 @@ if __name__ == '__main__':
                     linestyle = '-'
                 axs[r].plot(n_list, run_times, color=colors[5*j + i],
                             linewidth=0.4, linestyle=linestyle,
-                            label=(file[:file.find('-')] + " — "
+                            label=(file[:file.find('-')] + " - "
                                    + r"$k={{{}}}$".format(k)))
 
             axs[r].legend(fontsize=6, ncol=2, loc='upper left')
@@ -174,7 +174,7 @@ if __name__ == '__main__':
             axs[r].set_xlabel(r"$n$", fontsize=10)
             axs[r].set_title("OP build time for a "
                              + r"$k \times k \ conv$"
-                             + " — image size: "
+                             + " - image size: "
                              + r"$n \times n \times {{{}}}$".format(nch))
             axs[r].set_xscale('log')
             axs[r].set_yscale('log')
@@ -225,7 +225,7 @@ if __name__ == '__main__':
                     linestyle = '-'
                 axs[r].plot(n_list, run_times, color=colors[5*j + i],
                             linewidth=0.4, linestyle=linestyle,
-                            label=(file[:file.find('-')] + " — "
+                            label=(file[:file.find('-')] + " - "
                                    + r"$k={{{}}}$".format(k)))
 
             axs[r].legend(fontsize=6, ncol=2, loc='upper left')
@@ -233,7 +233,7 @@ if __name__ == '__main__':
             axs[r].set_xlabel(r"$n$", fontsize=10)
             axs[r].set_title("Only 50 calls to a "
                              + r"$k \times k \ conv$"
-                             + " — image size: "
+                             + " - image size: "
                              + r"$n \times n \times {{{}}}$".format(nch))
             axs[r].set_xscale('log')
             axs[r].set_yscale('log')
@@ -263,7 +263,7 @@ if __name__ == '__main__':
 
                 memory = []
                 n_list = []
-
+                bckend = file[:file.find('-')]
                 for n in info[file]["n"]:
                     if (nch, k, n) in info[file].keys():
 
@@ -274,31 +274,33 @@ if __name__ == '__main__':
 
                         memory.append(info[file][nch, k, n][1])
                         n_list.append(n)
-                        axs[r].scatter(n, info[file][nch, k, n][1],
+                        axs[r].scatter(n, info[file][nch, k, n][1] - (.060468 if 'devito' in bckend else .139660),
                                        s=2, color=colors[j], marker=marker)
 
                 if k == 3:
-                    label = (file[:file.find('-')] + r", $k=3, 5, 7, 9, 11$")
+                    label = (bckend + r", $k=3, 5, 7, 9, 11$")
                 else:
                     label = '_no_label_'
                 if j == 1:
                     linestyle = '--'
                 else:
                     linestyle = '-'
+                if 'devito' in bckend or 'torch' in bckend:
+                    const_m =.060468 if 'devito' in bckend else .139660
+                    memory = [m-const_m for m in memory]
                 axs[r].plot(n_list, memory, color=colors[j],
                             linestyle=linestyle,
                             linewidth=0.3, label=label, alpha=0.7)
-
             axs[r].legend(fontsize=6, ncol=2, loc='upper left')
             axs[r].set_ylabel("Memory (GB)", fontsize=8)
             axs[r].set_xlabel(r"$n$", fontsize=10)
             axs[r].set_title("50 calls to a " + r"$k \times k \ conv$"
-                             + " — image size: "
+                             + " - image size: "
                              + r"$n \times n \times {}$".format(int(nch)))
-            axs[r].set_xscale('log')
-            axs[r].set_yscale('log')
+            axs[r].set_xscale('log', basex=2)
+            axs[r].set_yscale('log', basey=2)
             axs[r].set_xlim([2e1, 2e4])
-            axs[r].set_ylim([7e-2, 1e2])
+            axs[r].set_ylim([1e-2, 1e2])
             ax.grid(True, which="both", ls="-", alpha=.2)
 
     for j, fig in enumerate(figs):
