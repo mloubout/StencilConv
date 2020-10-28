@@ -17,7 +17,7 @@ def conv(nx, ny, nchi, ncho, n, m, ngroup=1):
     # Image size
     dt = np.float32
     x, y, ci, co = SpaceDimension("x"), SpaceDimension("y"), Dimension("ci"), Dimension("co")
-    grid = Grid((nx, ny, nchi, ncho), dtype=dt, dimensions=(x, y, ci, co))
+    grid = Grid((nx, ny), dtype=dt, dimensions=(x, y))
 
     stride = 2
 
@@ -29,25 +29,21 @@ def conv(nx, ny, nchi, ncho, n, m, ngroup=1):
 
     # Output
     im_out = Function(name="imo", dimensions=(co, x, y),
-                      shape=(ncho, nx, ny), grid=grid, space_order=n//2)
+                      shape=(ncho, nx, ny), grid=grid, space_order=m//2)
     im_out.data
 
     # Weights
     i, j = Dimension("i"), Dimension("j")
-    W = Function(name="W", dimensions=(co, ci, i, j), shape=(ncho, nchi, n, m), grid=grid)
+    W = Function(name="W", dimensions=(co, ci, i, j), shape=(ncho, nchi, n, m), grid=grid, space_order=0)
     # popuate weights with deterministic values
-    for i in range(ncho):
-        for j in range(nchi):
-            W.data[i, j, :, :] = np.linspace(i+j, i+j+(n*m), n*m).reshape(n, m)
+    for ii in range(ncho):
+        for jj in range(nchi):
+            W.data[ii, jj, :, :] = np.linspace(ii+jj, ii+jj+(n*m), n*m).reshape(n, m)
 
     # Convlution
-    conv = [Eq(im_out, im_out+ sum([W[co, ci, i2, i1] * im_in[ci, x+i1-n//2, y+i2-m//2]
-                                    for i1 in range(n) for i2 in range(m)]))
-            for ci in range(nchi)]
-
+    conv = [Eq(im_out[co, x, y], im_out[co, x, y] + sum([W[co, ci, i, j] * im_in[ci, x+i-n//2, y+j-m//2] for ci in range(nchi)])) for co in range(ncho)]
     op = Operator(conv)
     op()
-
     # then return im_our.data[::stride, ::stride] .... if stride, and batchsize jut another dim like 6/7
     return im_out.data, im_in.data
 
@@ -96,7 +92,7 @@ def conv_torch(nx, ny, nchi, ncho, n, m):
         ww = np.zeros((ncho, nchi, n, m), dtype=np.float32)
         for i in range(ncho):
             for j in range(nchi):
-                ww[i, j, :, :] = np.linspace(i+j, i+j+(n*m), n*m).reshape(n, m).T
+                ww[i, j, :, :] = np.linspace(i+j, i+j+(n*m), n*m).reshape(n, m)
 
         convt.weight[:] = torch.from_numpy(ww)
 
@@ -114,7 +110,7 @@ def conv_torch(nx, ny, nchi, ncho, n, m):
 
 
 if __name__ == '__main__':
-    nx, ny, nchi, ncho = 128, 128, 4, 4
+    nx, ny, nchi, ncho = 128, 128, 4,4 
     n, m = 3, 3
     res1, x = conv(nx, ny, nchi, ncho, n, m)
     res2, grad_t = conv_torch(nx, ny, nchi, ncho, n, m)
