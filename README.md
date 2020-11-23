@@ -1,7 +1,16 @@
 # StencilConv
-Stencil based convolution benchmarking
 
-Basic 2D convolution with multi chanels. 
+Stencil based convolution with [Devito](https://github.com/devitocodes/devito/commits/master)
+
+# Content
+
+- [benchmark_cpu_2d](https://github.com/mloubout/StencilConv/benchmark_cpu_2d): Contains the 2D benchmark devito vs torch scripts and results (Ali what was the AWS hardware?)
+- [compare_scrips](https://github.com/mloubout/StencilConv/compare_scrips): Implementation fo the 2D and 3D multi-channel convolution and comparison against pytorch for correctness of the result.
+
+
+# Basic testrun
+
+Basic 2D convolution with multi chanels, this is an old script need to rerun the correct `test_nch_3d.py` instead
 
 - Batchsize can be added
 - Can think about stride later

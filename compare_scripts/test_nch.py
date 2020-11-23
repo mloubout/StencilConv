@@ -41,10 +41,11 @@ def conv(nx, ny, nchi, ncho, n, m, ngroup=1):
             W.data[ii, jj, :, :] = np.linspace(ii+jj, ii+jj+(n*m), n*m).reshape(n, m)
 
     # Convlution
-    conv = [Eq(im_out[co, x, y], im_out[co, x, y] + sum([W[co, ci, i, j] * im_in[ci, x+i-n//2, y+j-m//2] for ci in range(nchi)])) for co in range(ncho)]
+    conv = [Eq(im_out, im_out + sum([W[co, ci, i1, i2] * im_in[ci, x+i1-n//2, y+i2-m//2]
+                                       for i1 in range(n) for i2 in range(m)]))]
     op = Operator(conv)
     op()
-    print(op)
+
     return im_out.data, im_in.data
 
 
