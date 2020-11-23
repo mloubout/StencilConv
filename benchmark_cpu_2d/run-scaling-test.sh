@@ -16,7 +16,7 @@ do
 
             info=$( { /usr/bin/time --format \
                    'wall-clock time (s): %e\nmemory (kbytes): %M' \
-                   python devito-conv-fast.py $k $log_n $log_nch >> $devito_file; \
+                   python devito-conv.py $k $log_n $log_nch >> $devito_file; \
                    } 2>&1 )
 
             if [ $? -eq 0 ]
@@ -36,7 +36,7 @@ do
         done
 
         echo "log(nch)=$log_nch, k=$k — uploading to dropbox"
-        rclone copy --progress $devito_file GTDropbox:scaling-test/aws/
+        #rclone copy --progress $devito_file GTDropbox:scaling-test/aws/
 
     done
 done
