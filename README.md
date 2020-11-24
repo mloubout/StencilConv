@@ -5,7 +5,7 @@ Stencil based convolution with [Devito](https://github.com/devitocodes/devito/co
 # Content
 
 - [benchmark_cpu_2d](https://github.com/mloubout/StencilConv/tree/master/benchmark_cpu_2d): Contains the 2D benchmark devito vs torch scripts and results (Ali what was the AWS hardware?)
-- [compare_scrips](https://github.com/mloubout/StencilConv/tree/master/compare_scrips): Implementation fo the 2D and 3D multi-channel convolution and comparison against pytorch for correctness of the result.
+- [compare_scrips](https://github.com/mloubout/StencilConv/tree/master/compare_scripts): Implementation fo the 2D and 3D multi-channel convolution and comparison against pytorch for correctness of the result.
 
 
 # Basic testrun
