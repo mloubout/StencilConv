@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/315379853.svg)](https://zenodo.org/badge/latestdoi/315379853)
+
 # StencilConv
 
 Stencil based convolution with [Devito](https://github.com/devitocodes/devito/commits/master)
